@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location-Restricted Attendance Form</title>
+    <script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+    function showPosition(position) {
+        document.getElementById("latitude").value = position.coords.latitude;
+        document.getElementById("longitude").value = position.coords.longitude;
+        document.getElementById("submitBtn").disabled = false;
+    }
+    function showError(error) {
+        alert("Geolocation must be allowed to sign attendance.");
+    }
+    </script>
+</head>
+<body>
+    
+    
+    <style>
+      body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f4f7fa;
+        margin: 0;
+        padding: 0;
+      }
+      .attendance-container {
+        background: #fff;
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 32px 28px 24px 28px;
+        border-radius: 10px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        border-top: 6px solid #0078d4;
+      }
+      .attendance-container h2 {
+        margin-top: 0;
+        color: #0078d4;
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-bottom: 18px;
+      }
+      .attendance-label {
+        display: block;
+        margin-bottom: 6px;
+        color: #333;
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .attendance-input {
+        width: 100%;
+        padding: 9px 12px;
+        margin-bottom: 18px;
+        border: 1px solid #cfd8dc;
+        border-radius: 5px;
+        font-size: 15px;
+        background: #f9fbfc;
+        transition: border 0.2s;
+      }
+      .attendance-input:focus {
+        border-color: #0078d4;
+        outline: none;
+        background: #fff;
+      }
+      .attendance-btn {
+        width: 100%;
+        padding: 10px 0;
+        margin-bottom: 12px;
+        background: #0078d4;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .attendance-btn:disabled {
+        background: #b0c4de;
+        cursor: not-allowed;
+      }
+      .attendance-btn.secondary {
+        background: #e5eaf0;
+        color: #0078d4;
+        margin-bottom: 18px;
+      }
+      @media (max-width: 500px) {
+        .attendance-container {
+          padding: 18px 8px 16px 8px;
+        }
+      }
+    </style>
+    <div class="attendance-container">
+      <div style="text-align:center; margin-bottom: 18px;">
+        <!-- <img src="" alt="Logo" style="height:120px; margin-bottom:10px;"> -->
+      </div>
+      <h2 style="text-align:center; letter-spacing:1px;">Employee Attendance</h2>
+      <form method="POST" onsubmit="return true;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul>
+              {% for category, message in messages %}
+                <li style="color: {{'greenS' if category == 'success' else 'red'}}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <label class="attendance-label" for="first_name">First Name</label>
+        <input class="attendance-input" type="text" name="first_name" id="first_name" required>
+
+        <label class="attendance-label" for="last_name">Last Name</label>
+        <input class="attendance-input" type="text" name="last_name" id="last_name" required>
+
+        <label class="attendance-label" for="attendance_type">Attendance Type</label>
+        <select class="attendance-input" name="attendance_type" id="attendance_type" required>
+          <option value="" disabled selected>Select type</option>
+          <option value="Check In">Check In</option>
+          <option value="Check Out">Check Out</option>
+          <option value="Break">Break</option>
+        </select>
+
+        <label class="attendance-label" for="datetime">Date &amp; Time</label>
+        <input class="attendance-input" type="datetime-local" name="datetime" id="datetime" required>
+
+        <label class="attendance-label" for="designation">Designation</label>
+        <select class="attendance-input" name="designation" id="designation" required>
+          <option value="" disabled selected>Select designation</option>
+          <option value="Executive Director">Executive Director</option>
+          <option value="Programs Lead">Programs Lead</option>
+          <option value="Finance Lead">Finance Lead</option>
+          <option value="HOD M&E">HOD M&E</option>
+          <option value="Project Officer">Project Officer</option>
+          <option value="Data Entry Clerk">Data Entry Clerk</option>
+          <option value="Desk Officer">Desk Officer</option>
+          <option value="Community Case Manager">Community Case Manager</option>
+          <option value="Community Tester">Community Tester</option>
+          <option value="Admin Officer">Admin Officer</option>
+          <option value="Volunteer">Volunteer</option>
+        </select>
+        <input type="hidden" name="latitude" id="latitude" required>
+      
+        <input type="hidden" name="longitude" id="longitude" required>
+        <button type="button" class="attendance-btn secondary" onclick="getLocation()">Get My Location</button>
+        <button type="submit" class="attendance-btn" id="submitBtn" disabled>Submit Attendance</button>
+      </form>
+    </div>
+</body>
+</html>
