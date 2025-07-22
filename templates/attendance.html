@@ -2,121 +2,206 @@
 <html>
 <head>
     <title>Location-Restricted Attendance Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
     <script>
     function getLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition, showError);
         } else {
-            alert("Geolocation is not supported by this browser.");
+            showToast("Geolocation is not supported by this browser.", 'error');
         }
     }
     function showPosition(position) {
         document.getElementById("latitude").value = position.coords.latitude;
         document.getElementById("longitude").value = position.coords.longitude;
         document.getElementById("submitBtn").disabled = false;
+        showToast("Location fetched successfully!", 'success');
     }
     function showError(error) {
-        alert("Geolocation must be allowed to sign attendance.");
+        showToast("Geolocation must be allowed to sign attendance.", 'error');
+    }
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + (type === 'success' ? 'toast-success' : 'toast-error');
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.classList.add('show'); }, 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
     }
     </script>
-</head>
-<body>
-    
-    
     <style>
       body {
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background: #f4f7fa;
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(120deg, #e0e7ff 0%, #f4f7fa 100%);
         margin: 0;
         padding: 0;
+        min-height: 100vh;
       }
       .attendance-container {
         background: #fff;
-        max-width: 400px;
-        margin: 40px auto;
-        padding: 32px 28px 24px 28px;
-        border-radius: 10px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        border-top: 6px solid #0078d4;
+        max-width: 420px;
+        margin: 48px auto 0 auto;
+        padding: 36px 32px 28px 32px;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+        border-top: 7px solid #4f46e5;
+        animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
       }
       .attendance-container h2 {
         margin-top: 0;
-        color: #0078d4;
-        font-weight: 600;
+        color: #4f46e5;
+        font-weight: 700;
         letter-spacing: 1px;
-        margin-bottom: 18px;
+        margin-bottom: 20px;
+        font-size: 2rem;
+      }
+      .attendance-logo {
+        display: block;
+        margin: 0 auto 18px auto;
+        height: 80px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(79,70,229,0.08);
+        object-fit: contain;
+        background: #f4f7fa;
       }
       .attendance-label {
         display: block;
-        margin-bottom: 6px;
-        color: #333;
-        font-size: 15px;
-        font-weight: 500;
+        margin-bottom: 7px;
+        color: #22223b;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.2px;
       }
-      .attendance-input {
+      .attendance-input, .attendance-input:disabled {
         width: 100%;
-        padding: 9px 12px;
-        margin-bottom: 18px;
-        border: 1px solid #cfd8dc;
-        border-radius: 5px;
-        font-size: 15px;
-        background: #f9fbfc;
-        transition: border 0.2s;
+        padding: 11px 14px;
+        margin-bottom: 20px;
+        border: 1.5px solid #d1d5db;
+        border-radius: 7px;
+        font-size: 1rem;
+        background: #f8fafc;
+        transition: border 0.2s, box-shadow 0.2s;
+        box-shadow: 0 1px 2px rgba(79,70,229,0.03);
       }
       .attendance-input:focus {
-        border-color: #0078d4;
+        border-color: #4f46e5;
         outline: none;
         background: #fff;
+        box-shadow: 0 2px 8px rgba(79,70,229,0.08);
       }
       .attendance-btn {
         width: 100%;
-        padding: 10px 0;
-        margin-bottom: 12px;
-        background: #0078d4;
+        padding: 12px 0;
+        margin-bottom: 14px;
+        background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
         color: #fff;
         border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        font-weight: 600;
+        border-radius: 7px;
+        font-size: 1.08rem;
+        font-weight: 700;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: background 0.2s, transform 0.1s;
+        box-shadow: 0 2px 8px rgba(79,70,229,0.08);
+      }
+      .attendance-btn:active {
+        transform: scale(0.98);
       }
       .attendance-btn:disabled {
-        background: #b0c4de;
+        background: #c7d2fe;
+        color: #fff;
         cursor: not-allowed;
       }
       .attendance-btn.secondary {
-        background: #e5eaf0;
-        color: #0078d4;
+        background: #f1f5f9;
+        color: #4f46e5;
+        border: 1.5px solid #c7d2fe;
         margin-bottom: 18px;
+        font-weight: 600;
+        transition: background 0.2s, color 0.2s;
       }
-      @media (max-width: 500px) {
+      .attendance-btn.secondary:active {
+        background: #e0e7ff;
+      }
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 32px;
+        transform: translateX(-50%) scale(0.95);
+        min-width: 220px;
+        max-width: 90vw;
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 9999;
+        transition: opacity 0.3s, transform 0.3s;
+      }
+      .toast-success { background: #22c55e; }
+      .toast-error { background: #ef4444; }
+      .toast.show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(-50%) scale(1);
+      }
+      .flash-messages {
+        margin-bottom: 18px;
+        padding: 0;
+        list-style: none;
+        animation: fadeIn 0.7s cubic-bezier(.4,0,.2,1);
+      }
+      .flash-messages li {
+        padding: 10px 0 10px 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #22c55e;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: center;
+        transition: color 0.2s;
+      }
+      .flash-messages li.error {
+        color: #ef4444;
+      }
+      @media (max-width: 600px) {
         .attendance-container {
-          padding: 18px 8px 16px 8px;
+          padding: 16px 4vw 14px 4vw;
+          margin: 18px auto 0 auto;
+        }
+        .attendance-logo {
+          height: 56px;
         }
       }
     </style>
+</head>
+<body>
     <div class="attendance-container">
       <div style="text-align:center; margin-bottom: 18px;">
-        <!-- <img src="" alt="Logo" style="height:120px; margin-bottom:10px;"> -->
+        
       </div>
       <h2 style="text-align:center; letter-spacing:1px;">Employee Attendance</h2>
       <form method="POST" onsubmit="return true;">
             {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
-            <ul>
+            <ul class="flash-messages">
               {% for category, message in messages %}
-                <li style="color: {{'greenS' if category == 'success' else 'red'}}">{{ message }}</li>
+                <li class="{{ 'error' if category != 'success' else '' }}">{{ message }}</li>
               {% endfor %}
             </ul>
           {% endif %}
         {% endwith %}
 
         <label class="attendance-label" for="first_name">First Name</label>
-        <input class="attendance-input" type="text" name="first_name" id="first_name" required>
+        <input class="attendance-input" type="text" name="first_name" id="first_name" required autocomplete="given-name">
 
         <label class="attendance-label" for="last_name">Last Name</label>
-        <input class="attendance-input" type="text" name="last_name" id="last_name" required>
+        <input class="attendance-input" type="text" name="last_name" id="last_name" required autocomplete="family-name">
 
         <label class="attendance-label" for="attendance_type">Attendance Type</label>
         <select class="attendance-input" name="attendance_type" id="attendance_type" required>
@@ -145,7 +230,6 @@
           <option value="Volunteer">Volunteer</option>
         </select>
         <input type="hidden" name="latitude" id="latitude" required>
-      
         <input type="hidden" name="longitude" id="longitude" required>
         <button type="button" class="attendance-btn secondary" onclick="getLocation()">Get My Location</button>
         <button type="submit" class="attendance-btn" id="submitBtn" disabled>Submit Attendance</button>
