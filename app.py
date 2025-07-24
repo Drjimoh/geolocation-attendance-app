@@ -56,6 +56,22 @@ def attendance():
         return redirect(url_for('attendance'))
     return render_template("attendance.html")
     
+@app.route("/telegram_bot_campaign", methods=['GET', 'POST'])
+def telegram():
+    if request.method == "POST":
+        pass 
+    return render_template("telegram.html")
+
+@app.route("/whatsapp_bot_campaign", methods=['GET', 'POST'])
+def whatsapp():
+    if request.method == "POST":
+        pass 
+    return render_template("whatsapp.html")
+
+
+
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8099, debug=True)
     # app.run(debug=True)
