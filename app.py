@@ -20,7 +20,11 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * asin(sqrt(a))
     return R * c
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
+def landing():
+    return render_template("landing.html")
+
+@app.route("/attendance", methods=["GET", "POST"])
 def attendance():
     if request.method == "POST":
         username = request.form.get("first_name")
