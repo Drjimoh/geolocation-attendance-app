@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from math import radians, cos, sin, asin, sqrt
 import requests
 
@@ -60,6 +60,28 @@ def attendance():
         return redirect(url_for('attendance'))
     return render_template("attendance.html")
     
+@app.route("/contact", methods=["POST"])
+def contact():
+    name = request.form.get("name")
+    email = request.form.get("email")
+    company = request.form.get("company")
+    message = request.form.get("message")
+    n8n_webhook_url = "https://n8n.digitssphere.com/webhook/dc75eff5-cdb7-4a5f-b0b8-9bd35a070b64"
+    data = {
+        "name": name,
+        "email": email,
+        "company": company,
+        "message": message
+    }
+    try:
+        response = requests.post(n8n_webhook_url, json=data)
+        print(response.json())
+        response.raise_for_status()
+        contact_message = {"success": True, "text": "Thank you for contacting me! I will get back to you soon."}
+    except requests.exceptions.RequestException as e:
+        contact_message = {"success": False, "text": "Failed to send your message. Please try again later."}
+    return render_template("landing.html", contact_message=contact_message)
+
 @app.route("/telegram_bot_campaign", methods=['GET', 'POST'])
 def telegram():
     if request.method == "POST":

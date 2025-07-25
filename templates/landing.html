@@ -127,7 +127,12 @@
   <!-- Contact Form -->
   <section id="contact" class="max-w-2xl mx-auto py-12 px-4">
     <h2 class="text-2xl font-bold mb-4 text-blue-800">Contact Me</h2>
-    <form class="bg-white rounded-lg shadow p-6 flex flex-col gap-4">
+    {% if contact_message %}
+      <div class="text-center text-sm mb-2 {{ 'text-green-600' if contact_message.success else 'text-red-600' }}">
+        {{ contact_message.text }}
+      </div>
+    {% endif %}
+    <form id="contactForm" action="/contact" method="POST" class="bg-white rounded-lg shadow p-6 flex flex-col gap-4">
       <div>
         <label for="name" class="block font-semibold mb-1">Name</label>
         <input type="text" id="name" name="name" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition" />
@@ -152,5 +157,8 @@
   <footer class="text-center py-8 text-gray-400 text-sm">
     &copy; 2024 Waliu Jimoh. All rights reserved.
   </footer>
+  <script>
+    // Contact form AJAX removed; now handled by server-rendered message.
+  </script>
 </body>
 </html> 
