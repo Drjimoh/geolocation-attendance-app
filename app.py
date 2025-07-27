@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from math import radians, cos, sin, asin, sqrt
 import requests
+import os
 
 app = Flask(__name__)
 app.secret_key = 'mighty_secret_key'  # Set a secret key for session management
@@ -23,6 +24,72 @@ def haversine(lat1, lon1, lat2, lon2):
 @app.route("/", methods=["GET"])
 def landing():
     return render_template("landing.html")
+
+@app.route("/leads", methods=["GET"])
+def leads_landing():
+    return render_template("leads_landing.html")
+
+@app.route("/leads/process", methods=["POST"])
+def process_leads():
+    try:
+        # Get form data
+        business_category = request.form.get("business_category")
+        location = request.form.get("location")
+        number_of_leads = request.form.get("number_of_leads")
+        email = request.form.get("email")
+        service_type = request.form.get("service_type")
+        
+        # Get PayPal payment details
+        paypal_order_id = request.form.get("paypal_order_id")
+        paypal_payer_id = request.form.get("paypal_payer_id")
+        paypal_email = request.form.get("paypal_email")
+        paypal_name = request.form.get("paypal_name")
+        
+        # Calculate price based on service type and number of leads
+        base_price = 50  # Base price for scrape only
+        if service_type == "scrape_ai":
+            base_price = 100
+        elif service_type == "full_outreach":
+            base_price = 200
+        
+        # Add cost per lead
+        price_per_lead = 2
+        total_price = base_price + (int(number_of_leads) * price_per_lead)
+        
+        # If PayPal payment details are present, send to n8n webhook
+        if paypal_order_id and paypal_payer_id:
+            n8n_webhook_url = "https://n8n.yourdomain.com/webhook/scrape-start"
+            data = {
+                "business_category": business_category,
+                "location": location,
+                "number_of_leads": number_of_leads,
+                "email": email,
+                "service_type": service_type,
+                "total_price": total_price,
+                "paypal_order_id": paypal_order_id,
+                "paypal_payer_id": paypal_payer_id,
+                "paypal_email": paypal_email,
+                "paypal_name": paypal_name
+            }
+            
+            try:
+                response = requests.post(n8n_webhook_url, json=data)
+                response.raise_for_status()
+                print(f"Data sent to n8n webhook: {response.json()}")
+                return jsonify({"success": True, "message": "Order processed successfully"})
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending data to n8n: {e}")
+                return jsonify({"success": False, "message": "Payment successful but order processing failed. Please contact support."}), 500
+        else:
+            return jsonify({"success": False, "message": "Payment verification failed. Please try again."}), 400
+            
+    except Exception as e:
+        print(f"Error processing leads order: {e}")
+        return jsonify({"success": False, "message": "An error occurred. Please try again."}), 500
+
+@app.route("/leads/success")
+def leads_success():
+    return render_template("leads_success.html")
 
 @app.route("/attendance", methods=["GET", "POST"])
 def attendance():
